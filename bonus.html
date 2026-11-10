@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ボーナス手取りの目安｜賞与から社会保険料・所得税を差し引いた額を計算</title>
+<meta name="description" content="賞与（ボーナス）の額面から、社会保険料と所得税を差し引いた手取り額の目安を計算する無料ツールです。料率・税率は変更できます。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#b45309; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .f label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .f input,.f select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td{padding:6px 0;color:var(--sub)} td.v{text-align:right;color:var(--ink);font-weight:800}
+  .note{font-size:13px;color:var(--sub)}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>ボーナス手取りの目安</h1>
+    <p>賞与（ボーナス）の額面から、社会保険料と所得税を差し引いた手取り額の目安を計算します。</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="f"><label>賞与額（額面・円）</label><input id="bonus" type="number" min="0" step="1000" value="500000"></div>
+      <div class="f"><label>社会保険料率（％）</label><input id="shahoRate" type="number" min="0" max="100" step="0.001" value="15.545"></div>
+      <div class="f"><label>所得税率（％）</label><input id="taxRate" type="number" min="0" max="100" step="0.01" value="10.21"></div>
+    </div>
+    <p class="note" style="margin-top:10px">社会保険料率の初期値15.545％は、健康保険5.0％＋介護保険0.795％（40〜64歳）＋厚生年金9.15％＋雇用保険0.6％（いずれも被保険者負担分）の合計です。健康保険料率は加入する保険者や都道府県で異なります。所得税率の初期値10.21％は一例です。賞与の所得税率は「前月の給与（社会保険料控除後）」と扶養人数で決まるため、実際の税率は人によって変わります。住民税は賞与から直接差し引かれないため、この計算には含めていません。</p>
+  </div>
+
+  <div class="card">
+    <table>
+      <tr><td>社会保険料</td><td class="v" id="shaho">-</td></tr>
+      <tr><td>所得税（課税対象額 × 所得税率）</td><td class="v" id="tax">-</td></tr>
+      <tr><td>手取り額の目安</td><td class="v" id="net">-</td></tr>
+    </table>
+    <p class="note" style="margin-top:10px">計算方法：社会保険料＝賞与額×社会保険料率、所得税＝（賞与額−社会保険料）×所得税率、手取り＝賞与額−社会保険料−所得税。実際の賞与計算では標準賞与額（1,000円未満切り捨て）や料率の端数処理などが行われるため、実際の支給額とは数円〜数百円程度異なる場合があります。あくまで目安としてご利用ください。</p>
+  </div>
+
+  <footer>入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+
+<script>
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const yen = n => Math.round(n).toLocaleString("ja-JP") + " 円";
+
+function calc(){
+  const bonus = num(bonusEl.value);
+  const shahoRate = num(rateEl.value) / 100;
+  const taxRate = num(taxRateEl.value) / 100;
+  const shaho = Math.round(bonus * shahoRate);
+  const tax = Math.round((bonus - shaho) * taxRate);
+  const net = bonus - shaho - tax;
+  shahoEl.textContent = yen(shaho);
+  taxEl.textContent = yen(tax);
+  netEl.textContent = yen(net);
+}
+const bonusEl = document.getElementById("bonus"), rateEl = document.getElementById("shahoRate"),
+      taxRateEl = document.getElementById("taxRate");
+const shahoEl = document.getElementById("shaho"), taxEl = document.getElementById("tax"),
+      netEl = document.getElementById("net");
+[bonusEl, rateEl, taxRateEl].forEach(e => e.addEventListener("input", calc));
+calc();
+</script>
+</body>
+</html>

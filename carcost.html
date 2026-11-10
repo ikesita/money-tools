@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>車の年間維持費シミュレーション｜税金・保険・車検・ガソリン代の合計を計算</title>
+<meta name="description" content="自動車税・任意保険・車検費用・ガソリン代・駐車場代などから、車の年間維持費と月平均の目安を計算する無料ツールです。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#b45309; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .f label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .f input,.f select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td{padding:6px 0;color:var(--sub)} td.v{text-align:right;color:var(--ink);font-weight:800}
+  .note{font-size:13px;color:var(--sub)}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>車の年間維持費シミュレーション</h1>
+    <p>税金・保険・車検・ガソリン代・駐車場代など、車にかかる費用を年間合計と月平均で計算します。</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="f"><label>自動車税（年額・円）</label><input id="tax" type="number" min="0" step="500" value="36000"></div>
+      <div class="f"><label>任意保険料（年額・円）</label><input id="insurance" type="number" min="0" step="1000" value="60000"></div>
+      <div class="f"><label>車検費用（2年分・円）※年換算します</label><input id="shaken" type="number" min="0" step="1000" value="100000"></div>
+      <div class="f"><label>ガソリン代（月額・円）</label><input id="gas" type="number" min="0" step="500" value="10000"></div>
+      <div class="f"><label>駐車場代（月額・円）</label><input id="parking" type="number" min="0" step="500" value="15000"></div>
+      <div class="f"><label>その他（年額・円）※タイヤ・オイル・高速代など</label><input id="other" type="number" min="0" step="1000" value="20000"></div>
+    </div>
+    <p class="note" style="margin-top:10px">車検費用は2年に1回かかる費用として、入力額を2で割って年換算しています。車検のない年・ある年で実際の支出は変動します。</p>
+  </div>
+
+  <div class="card">
+    <table>
+      <tr><td>車検費用（年換算）</td><td class="v" id="shakenYear">-</td></tr>
+      <tr><td>ガソリン代（年換算）</td><td class="v" id="gasYear">-</td></tr>
+      <tr><td>駐車場代（年換算）</td><td class="v" id="parkingYear">-</td></tr>
+      <tr><td>年間維持費の合計</td><td class="v" id="total">-</td></tr>
+      <tr><td>月平均</td><td class="v" id="monthly">-</td></tr>
+    </table>
+    <p class="note" style="margin-top:10px">計算方法：年間合計＝自動車税＋任意保険＋車検費用÷2＋ガソリン代×12＋駐車場代×12＋その他。月平均＝年間合計÷12。車両本体の購入費・ローン返済、修理費の突発的な支出は含まれていません。あくまで目安としてご利用ください。</p>
+  </div>
+
+  <footer>入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+
+<script>
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const yen = n => Math.round(n).toLocaleString("ja-JP") + " 円";
+
+function calc(){
+  const tax = num(taxEl.value);
+  const insurance = num(insEl.value);
+  const shakenYear = num(shakenEl.value) / 2;
+  const gasYear = num(gasEl.value) * 12;
+  const parkingYear = num(parkingEl.value) * 12;
+  const other = num(otherEl.value);
+  const total = tax + insurance + shakenYear + gasYear + parkingYear + other;
+  shakenYearEl.textContent = yen(shakenYear);
+  gasYearEl.textContent = yen(gasYear);
+  parkingYearEl.textContent = yen(parkingYear);
+  totalEl.textContent = yen(total);
+  monthlyEl.textContent = yen(total / 12);
+}
+const taxEl = document.getElementById("tax"), insEl = document.getElementById("insurance"),
+      shakenEl = document.getElementById("shaken"), gasEl = document.getElementById("gas"),
+      parkingEl = document.getElementById("parking"), otherEl = document.getElementById("other");
+const shakenYearEl = document.getElementById("shakenYear"), gasYearEl = document.getElementById("gasYear"),
+      parkingYearEl = document.getElementById("parkingYear"), totalEl = document.getElementById("total"),
+      monthlyEl = document.getElementById("monthly");
+[taxEl, insEl, shakenEl, gasEl, parkingEl, otherEl].forEach(e => e.addEventListener("input", calc));
+calc();
+</script>
+</body>
+</html>
