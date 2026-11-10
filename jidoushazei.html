@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>自動車税の目安｜排気量別の年額（令和元年10月以降登録の自家用乗用車）</title>
+<meta name="description" content="総排気量から、自家用乗用車の自動車税（種別割）の年額の目安を表示する無料ツールです。令和元年10月1日以降に新規登録された車の税率で計算します。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#b45309; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .f label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .f input,.f select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td{padding:6px 0;color:var(--sub)} td.v{text-align:right;color:var(--ink);font-weight:800}
+  .list td{padding:5px 0;border-bottom:1px solid var(--line)}
+  .list td.v{text-align:right}
+  .hit{background:#fef3c7}
+  .big{font-size:22px;font-weight:800;color:var(--ink)}
+  .warn{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 14px;font-size:13.5px;color:#7f1d1d}
+  .note{font-size:13px;color:var(--sub)}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>自動車税の目安</h1>
+    <p>総排気量から、自家用乗用車の自動車税（種別割）の年額の目安を表示します。令和元年10月1日以降に新規登録された車の税率です。</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="f"><label>車の種類</label>
+        <select id="kind">
+          <option value="car" selected>自家用乗用車（普通車）</option>
+          <option value="kei">軽自動車</option>
+        </select>
+      </div>
+      <div class="f" id="ccField"><label>総排気量（cc）</label><input id="cc" type="number" min="0" step="1" value="1800"></div>
+    </div>
+    <p class="big" id="headline" style="margin:14px 0 0">-</p>
+  </div>
+
+  <div class="card">
+    <table>
+      <tr><td>区分</td><td class="v" id="rBand">-</td></tr>
+      <tr><td>自動車税（種別割）の年額</td><td class="v" id="rTax">-</td></tr>
+    </table>
+    <p class="note" style="margin-top:10px">軽自動車の年額10,800円は「軽自動車税（種別割）」で、市町村に納める税金です。普通車の自動車税は都道府県に納めます。</p>
+  </div>
+
+  <div class="card">
+    <p class="note" style="margin:0 0 8px">自家用乗用車の税率表（令和元年10月1日以降に新規登録された車）</p>
+    <table class="list" id="rateTable"></table>
+  </div>
+
+  <div class="warn">
+    <strong>必ずお読みください：</strong>このツールはあくまで目安です。令和元年9月30日以前に登録された車は旧税率（年額が少し高くなります）、営業用（トラック・タクシーなど）は別の税率です。また、登録から一定年数を超えた車は重課（おおむね15％増）になる場合があり、エコカー減税などの軽減措置が適用される場合もあります。正確な税額は納税通知書やお住まいの都道府県・市町村でご確認ください。
+  </div>
+
+  <footer>入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+
+<script>
+const RATES = [
+  [1000, 25000, "1,000cc以下"],
+  [1500, 30500, "1,000cc超〜1,500cc以下"],
+  [2000, 36000, "1,500cc超〜2,000cc以下"],
+  [2500, 43500, "2,000cc超〜2,500cc以下"],
+  [3000, 50000, "2,500cc超〜3,000cc以下"],
+  [3500, 57000, "3,000cc超〜3,500cc以下"],
+  [4000, 65500, "3,500cc超〜4,000cc以下"],
+  [4500, 73000, "4,000cc超〜4,500cc以下"],
+  [6000, 87000, "4,500cc超〜6,000cc以下"],
+  [Infinity, 110000, "6,000cc超"]
+];
+const KEI_TAX = 10800;
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const yen = n => n.toLocaleString("ja-JP") + " 円";
+
+function bandOf(cc){
+  for(const r of RATES){ if(cc <= r[0]) return r; }
+  return RATES[RATES.length - 1];
+}
+
+function calc(){
+  const kind = document.getElementById("kind").value;
+  const cc = num(document.getElementById("cc").value);
+  document.getElementById("ccField").style.display = kind === "kei" ? "none" : "";
+  let band = null, tax;
+  if(kind === "kei"){
+    tax = KEI_TAX;
+    document.getElementById("rBand").textContent = "軽自動車（一律）";
+  } else {
+    band = bandOf(cc);
+    tax = band[1];
+    document.getElementById("rBand").textContent = band[2];
+  }
+  document.getElementById("rTax").textContent = yen(tax);
+  document.getElementById("headline").textContent = "自動車税の年額の目安は " + yen(tax) + " です";
+  const rows = RATES.map(r => {
+    const hit = band && r === band ? ' class="hit"' : "";
+    return "<tr" + hit + "><td>" + r[2] + "</td><td class=\"v\">" + yen(r[1]) + "</td></tr>";
+  }).join("");
+  document.getElementById("rateTable").innerHTML = rows;
+}
+document.getElementById("kind").addEventListener("input", calc);
+document.getElementById("cc").addEventListener("input", calc);
+calc();
+</script>
+</body>
+</html>
