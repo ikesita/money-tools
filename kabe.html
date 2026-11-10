@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>年収の壁チェッカー｜103万・106万・130万・150万・201万円の壁との比較</title>
+<meta name="description" content="パート・アルバイト等の年収が、いわゆる「年収の壁」（103万円・106万円・130万円・150万円・201万円）をどのくらい超えているかをチェックできる無料ツールです。あくまで目安です。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#b45309; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .f label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .f input,.f select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  th{text-align:left;color:var(--sub);font-size:13px;font-weight:600;padding:6px 8px 6px 0;border-bottom:1px solid var(--line)}
+  td{padding:9px 8px 9px 0;border-bottom:1px solid var(--line);vertical-align:top}
+  td.wall{font-weight:800;white-space:nowrap}
+  td.st{font-weight:800;white-space:nowrap}
+  .over{color:#b91c1c}
+  .under{color:#047857}
+  td.nt{color:var(--sub);font-size:13.5px}
+  .warn{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 14px;font-size:13.5px;color:#7f1d1d}
+  .note{font-size:13px;color:var(--sub)}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>年収の壁チェッカー</h1>
+    <p>パート・アルバイトなどの年収が、いわゆる「年収の壁」と比べてどの位置にあるかをチェックします。</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="f"><label>年収（万円）※税込の年間収入の見込み</label><input id="income" type="number" min="0" step="1" value="128"></div>
+    </div>
+    <p class="note" style="margin-top:10px">交通費（非課税分）の扱いなど、壁ごとに「年収」に含める範囲が異なる場合があります。ここでは単純に、入力した年収と各ラインを比べています。</p>
+  </div>
+
+  <div class="card">
+    <table>
+      <tr><th>ライン</th><th>状態</th><th>意味（目安）</th></tr>
+      <tr>
+        <td class="wall">103万円</td><td class="st" id="st103">-</td>
+        <td class="nt">所得税がかかり始める目安です（給与所得控除＋基礎控除の合計が103万円という従来の計算）。超えると自分に所得税がかかるほか、配偶者の配偶者控除にも関係します。</td>
+      </tr>
+      <tr>
+        <td class="wall">106万円</td><td class="st" id="st106">-</td>
+        <td class="nt">一定規模以上の勤務先で、週の所定労働時間20時間以上・月額賃金8.8万円以上などの条件を満たすと、社会保険（健康保険・厚生年金）への加入対象になる目安です。勤務先の規模や働き方によっては当てはまりません。</td>
+      </tr>
+      <tr>
+        <td class="wall">130万円</td><td class="st" id="st130">-</td>
+        <td class="nt">社会保険の扶養（被扶養者）でいられる年収見込みの目安です。条件は「130万円未満」なので、130万円ちょうどでも扶養から外れる扱いになります。超えると自分で社会保険料を負担します。</td>
+      </tr>
+      <tr>
+        <td class="wall">150万円</td><td class="st" id="st150">-</td>
+        <td class="nt">配偶者特別控除が満額受けられる目安です。超えると控除額が段階的に減っていきます（配偶者本人の所得金額によって判定されます）。</td>
+      </tr>
+      <tr>
+        <td class="wall">201万円</td><td class="st" id="st201">-</td>
+        <td class="nt">配偶者特別控除の対象から外れる目安です（正確には配偶者の所得金額が133万円を超えるあたりで控除がなくなります）。</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="warn">
+    <strong>必ずお読みください：</strong>このツールはあくまで大まかな目安です。「年収の壁」は2025年以降の税制改正で基礎控除・給与所得控除の見直しが進んでおり、金額や扱いが変わりつつあります。また、勤務先の規模・働き方（労働時間・賃金）、お住まいの自治体、家族の状況によって実際の扱いは大きく異なります。正確な判定や手続きについては、勤務先の担当窓口・自治体・税務署・年金事務所などで必ずご確認ください。
+  </div>
+
+  <footer>入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+
+<script>
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+
+function setStatus(id, over){
+  const el = document.getElementById(id);
+  el.textContent = over ? "超えています" : "超えていません";
+  el.className = "st " + (over ? "over" : "under");
+}
+
+function calc(){
+  const inc = num(document.getElementById("income").value);
+  setStatus("st103", inc > 103);        // 所得税は103万円を超えると発生
+  setStatus("st106", inc >= 106);       // 社保加入は106万円前後が目安
+  setStatus("st130", inc >= 130);       // 扶養の条件は「130万円未満」
+  setStatus("st150", inc > 150);        // 配偶者特別控除の満額ライン
+  setStatus("st201", inc > 201);        // 配偶者特別控除の対象外ライン
+}
+document.getElementById("income").addEventListener("input", calc);
+calc();
+</script>
+</body>
+</html>
