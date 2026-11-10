@@ -1,0 +1,26 @@
+# お金の計算ツール集
+
+> ふるさと納税の控除上限、退職金の税金、年金受給額、雇用保険料、住宅ローン繰上返済、電気料金など、お金の目安をブラウザで計算できる無料ツール集です。
+
+## Pages
+
+- [お金の計算ツール集 (top page)](https://ikesita.github.io/money-tools/)
+- [ふるさと納税 控除上限額の目安](https://ikesita.github.io/money-tools/furusato.html)
+- [退職金にかかる税金計算機](https://ikesita.github.io/money-tools/taishoku.html)
+- [年金受給額の目安計算機](https://ikesita.github.io/money-tools/nenkin.html)
+- [雇用保険料計算機](https://ikesita.github.io/money-tools/koyou.html)
+- [住宅ローン繰上返済シミュレーション](https://ikesita.github.io/money-tools/kurikoshi.html)
+- [電気料金の目安計算機](https://ikesita.github.io/money-tools/denki.html)
+- [失業手当（基本手当）の目安計算機](https://ikesita.github.io/money-tools/shitsugyo.html)
+- [iDeCo節税シミュレーション](https://ikesita.github.io/money-tools/ideco.html)
+- [ボーナス手取りの目安](https://ikesita.github.io/money-tools/bonus.html)
+- [車の年間維持費シミュレーション](https://ikesita.github.io/money-tools/carcost.html)
+- [年収の壁チェッカー](https://ikesita.github.io/money-tools/kabe.html)
+- [住宅ローン借入可能額の目安](https://ikesita.github.io/money-tools/loanlimit.html)
+- [医療費控除の目安](https://ikesita.github.io/money-tools/iryouhi.html)
+- [自動車税の目安](https://ikesita.github.io/money-tools/jidoushazei.html)
+- [相続税の目安（簡易計算）](https://ikesita.github.io/money-tools/souzoku.html)
+- [年末調整の還付金の目安](https://ikesita.github.io/money-tools/nenmatsu.html)
+- [住民税の目安](https://ikesita.github.io/money-tools/juminzei.html)
+- [老後資金の不足額シミュレーション](https://ikesita.github.io/money-tools/rogo.html)
+- [副業の確定申告 要否チェッカー](https://ikesita.github.io/money-tools/kakutei.html)
