@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>年金受給額の目安計算機｜老齢基礎年金＋厚生年金を試算</title>
+<meta name="description" content="現役時代の平均年収と厚生年金・国民年金の加入年数から、老齢年金（基礎＋厚生）の月額・年額の目安を計算する無料ツールです。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#0f766e; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .f label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .f input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+  .big{font-size:32px;font-weight:900;text-align:center;margin:8px 0 2px}
+  .sub2{text-align:center;color:var(--sub);font-size:14px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td{padding:6px 0;color:var(--sub)} td.v{text-align:right;color:var(--ink);font-weight:800}
+  .note{font-size:13px;color:var(--sub)}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>年金受給額の目安</h1>
+    <p>老齢基礎年金と老齢厚生年金（報酬比例部分）の合計の目安を試算します。</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="f"><label>平均年収（現役時代・万円）</label><input id="avgIncome" type="number" min="0" step="10" value="500"></div>
+      <div class="f"><label>厚生年金 加入年数</label><input id="kouseiYears" type="number" min="0" max="60" step="1" value="40"></div>
+      <div class="f"><label>国民年金（基礎）加入年数</label><input id="kisoYears" type="number" min="0" max="40" step="1" value="40"></div>
+    </div>
+    <div class="big" id="monthly">-</div>
+    <div class="sub2">月額の目安</div>
+  </div>
+
+  <div class="card">
+    <table>
+      <tr><td>老齢基礎年金（年額）</td><td class="v" id="kisoAnnual">-</td></tr>
+      <tr><td>老齢厚生年金・報酬比例（年額）</td><td class="v" id="kouseiAnnual">-</td></tr>
+      <tr><td>合計（年額）</td><td class="v" id="totalAnnual">-</td></tr>
+      <tr><td>合計（月額）</td><td class="v" id="totalMonthly">-</td></tr>
+    </table>
+    <p class="note" style="margin-top:10px">計算方法：老齢基礎年金は満額831,700円（令和7年度の目安額として固定表示しています。年金額は年度ごとに改定されます）× 基礎加入月数 ÷ 480か月。老齢厚生年金は、平均標準報酬月額（平均年収 ÷ 12で近似）× 5.481/1000 × 厚生年金加入月数 で計算しています。再評価率、経過的加算、加給年金、振替加算、繰上げ・繰下げ受給、給付乗率の生年月日による差は考慮していません。正確な見込額は「ねんきんネット」や年金事務所でご確認ください。</p>
+  </div>
+
+  <footer>入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+
+<script>
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const yen = n => Math.round(n).toLocaleString("ja-JP") + " 円";
+const FULL_KISO = 831700; // 令和7年度 満額の目安（固定表示）
+function calc(){
+  const avgMonthly = num(avgIncomeEl.value) * 10000 / 12; // 平均標準報酬月額の近似
+  const kisoMonths = Math.min(num(kisoYearsEl.value), 40) * 12;
+  const kouseiMonths = num(kouseiYearsEl.value) * 12;
+  const kiso = FULL_KISO * kisoMonths / 480;
+  const kousei = avgMonthly * (5.481 / 1000) * kouseiMonths;
+  const total = kiso + kousei;
+  monthlyEl.textContent = "約 " + yen(total / 12);
+  kisoAnnualEl.textContent = yen(kiso);
+  kouseiAnnualEl.textContent = yen(kousei);
+  totalAnnualEl.textContent = yen(total);
+  totalMonthlyEl.textContent = yen(total / 12);
+}
+const avgIncomeEl = document.getElementById("avgIncome"), kouseiYearsEl = document.getElementById("kouseiYears"), kisoYearsEl = document.getElementById("kisoYears");
+const monthlyEl = document.getElementById("monthly"), kisoAnnualEl = document.getElementById("kisoAnnual"),
+      kouseiAnnualEl = document.getElementById("kouseiAnnual"), totalAnnualEl = document.getElementById("totalAnnual"),
+      totalMonthlyEl = document.getElementById("totalMonthly");
+[avgIncomeEl, kouseiYearsEl, kisoYearsEl].forEach(e => e.addEventListener("input", calc));
+calc();
+</script>
+</body>
+</html>

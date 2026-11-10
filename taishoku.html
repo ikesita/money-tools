@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>退職金にかかる税金計算機｜退職所得控除・所得税・住民税と手取り目安</title>
+<meta name="description" content="退職金額と勤続年数から、退職所得控除、所得税（復興特別所得税込み）、住民税、手取りの目安を計算する無料ツールです。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#7c3aed; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .f label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .f input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td{padding:6px 0;color:var(--sub)} td.v{text-align:right;color:var(--ink);font-weight:800}
+  .note{font-size:13px;color:var(--sub)}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>退職金にかかる税金</h1>
+    <p>退職金は他の所得と合算しない「分離課税」で、退職所得控除を受けたうえで課税されます。</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="f"><label>退職金額（円）</label><input id="amount" type="number" min="0" step="100000" value="15000000"></div>
+      <div class="f"><label>勤続年数（年）※1年未満は切り上げで計算します</label><input id="years" type="number" min="0" step="0.1" value="25"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <table>
+      <tr><td>退職所得控除額</td><td class="v" id="deduction">-</td></tr>
+      <tr><td>課税退職所得金額</td><td class="v" id="taxable">-</td></tr>
+      <tr><td>所得税（復興特別所得税込み）</td><td class="v" id="incomeTax">-</td></tr>
+      <tr><td>住民税</td><td class="v" id="residentTax">-</td></tr>
+      <tr><td>税金の合計</td><td class="v" id="totalTax">-</td></tr>
+      <tr><td>手取りの目安</td><td class="v" id="net">-</td></tr>
+    </table>
+    <p class="note" style="margin-top:10px">計算方法：退職所得控除は勤続20年以下で40万円×年数（最低80万円）、20年超で800万円＋70万円×（年数−20）。課税退職所得は（退職金−控除）×1/2（1,000円未満切り捨て）。所得税は速算表による税額に復興特別所得税2.1％を加算し、住民税は課税退職所得の10％です。勤続5年以下の役員等など、1/2課税が適用されない場合や、障害者控除等の特例は考慮していません。正確な金額は源泉徴収票・税務署でご確認ください。</p>
+  </div>
+
+  <footer>入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+
+<script>
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const yen = n => Math.floor(n).toLocaleString("ja-JP") + " 円";
+const BRACKETS = [ // [上限, 税率, 控除額] 速算表
+  [1950000, 0.05, 0], [3300000, 0.10, 97500], [6950000, 0.20, 427500],
+  [9000000, 0.23, 636000], [18000000, 0.33, 1536000], [40000000, 0.40, 2796000],
+  [Infinity, 0.45, 4796000]
+];
+function incomeTaxOf(taxable){
+  for(const [cap, rate, ded] of BRACKETS) if(taxable <= cap) return Math.floor((taxable * rate - ded) * 1.021);
+  return 0;
+}
+function calc(){
+  const amount = num(amountEl.value);
+  const years = Math.ceil(num(yearsEl.value)); // 1年未満切り上げ
+  let deduction;
+  if(years <= 0) deduction = 0;
+  else if(years <= 20) deduction = Math.max(400000 * years, 800000);
+  else deduction = 8000000 + 700000 * (years - 20);
+  let taxable = Math.floor((amount - deduction) / 2 / 1000) * 1000;
+  if(taxable < 0) taxable = 0;
+  const it = incomeTaxOf(taxable);
+  const rt = Math.floor(taxable * 0.10);
+  deductionEl.textContent = yen(deduction);
+  taxableEl.textContent = yen(taxable);
+  incomeTaxEl.textContent = yen(it);
+  residentTaxEl.textContent = yen(rt);
+  totalTaxEl.textContent = yen(it + rt);
+  netEl.textContent = yen(amount - it - rt);
+}
+const amountEl = document.getElementById("amount"), yearsEl = document.getElementById("years");
+const deductionEl = document.getElementById("deduction"), taxableEl = document.getElementById("taxable"),
+      incomeTaxEl = document.getElementById("incomeTax"), residentTaxEl = document.getElementById("residentTax"),
+      totalTaxEl = document.getElementById("totalTax"), netEl = document.getElementById("net");
+[amountEl, yearsEl].forEach(e => e.addEventListener("input", calc));
+calc();
+</script>
+</body>
+</html>

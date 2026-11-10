@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>雇用保険料計算機｜令和7年度・労働者負担率で月額・年額を計算</title>
+<meta name="description" content="月給と業種から、雇用保険料の労働者負担（月額・年額）を計算する無料ツールです。事業主負担の目安も表示します。令和7年度の料率を使用。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#b45309; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .f label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .f input,.f select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td{padding:6px 0;color:var(--sub)} td.v{text-align:right;color:var(--ink);font-weight:800}
+  .note{font-size:13px;color:var(--sub)}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>雇用保険料計算機</h1>
+    <p>令和7年度の保険料率で、給与から引かれる雇用保険料（労働者負担）の目安を計算します。</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="f"><label>月給（円）※賞与・手当を含む賃金総額</label><input id="salary" type="number" min="0" step="1000" value="300000"></div>
+      <div class="f"><label>業種</label>
+        <select id="industry">
+          <option value="general">一般の事業</option>
+          <option value="agri">農林水産・清酒製造の事業</option>
+          <option value="const">建設の事業</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <table>
+      <tr><td>適用料率（労働者負担）</td><td class="v" id="rateUsed">-</td></tr>
+      <tr><td>労働者負担（月額）</td><td class="v" id="workerMonthly">-</td></tr>
+      <tr><td>労働者負担（年額・月給×12換算）</td><td class="v" id="workerAnnual">-</td></tr>
+      <tr><td>参考：事業主負担（月額）</td><td class="v" id="employerMonthly">-</td></tr>
+    </table>
+    <p class="note" style="margin-top:10px">料率（令和7年度）：労働者負担は一般の事業 6/1000、農林水産・清酒製造の事業 7/1000、建設の事業 7/1000。事業主負担は一般 9.5/1000、農林水産等 10.5/1000、建設 11.5/1000 です。雇用保険料率は毎年度見直されます。また、実際の保険料は賞与を含む各月の賃金総額に対して計算され、1円未満の端数処理は事業所の慣行により異なります。正式な金額は給与明細・厚生労働省の料率表でご確認ください。</p>
+  </div>
+
+  <footer>入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+
+<script>
+const RATES = {
+  general: { worker: 6/1000, employer: 9.5/1000, label: "6/1000" },
+  agri:    { worker: 7/1000, employer: 10.5/1000, label: "7/1000" },
+  const:   { worker: 7/1000, employer: 11.5/1000, label: "7/1000" }
+};
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const yen = n => Math.round(n).toLocaleString("ja-JP") + " 円";
+function calc(){
+  const salary = num(salaryEl.value);
+  const r = RATES[indEl.value];
+  rateEl.textContent = r.label + "（令和7年度）";
+  wmEl.textContent = yen(salary * r.worker);
+  waEl.textContent = yen(salary * r.worker * 12);
+  emEl.textContent = yen(salary * r.employer);
+}
+const salaryEl = document.getElementById("salary"), indEl = document.getElementById("industry");
+const rateEl = document.getElementById("rateUsed"), wmEl = document.getElementById("workerMonthly"),
+      waEl = document.getElementById("workerAnnual"), emEl = document.getElementById("employerMonthly");
+[salaryEl, indEl].forEach(e => e.addEventListener("input", calc));
+calc();
+</script>
+</body>
+</html>

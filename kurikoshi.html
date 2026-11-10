@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>住宅ローン繰上返済シミュレーション｜期間短縮型の効果の目安</title>
+<meta name="description" content="住宅ローンの繰上返済（期間短縮型）で、返済期間がどれくらい短くなり、利息をどれくらい節約できるかの目安を計算する無料ツールです。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#0891b2; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .f label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .f input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td{padding:6px 0;color:var(--sub)} td.v{text-align:right;color:var(--ink);font-weight:800}
+  .note{font-size:13px;color:var(--sub)}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>住宅ローン繰上返済シミュレーション</h1>
+    <p>毎月返済額を変えずに期間を短くする「期間短縮型」の効果の概算です。</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="f"><label>現在のローン残高（円）</label><input id="balance" type="number" min="0" step="100000" value="25000000"></div>
+      <div class="f"><label>年利（％）</label><input id="rate" type="number" min="0" step="0.05" value="1.0"></div>
+      <div class="f"><label>残りの返済期間（年）</label><input id="years" type="number" min="0" max="50" step="1" value="30"></div>
+      <div class="f"><label>繰上返済額（円）</label><input id="prepay" type="number" min="0" step="100000" value="2000000"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <table>
+      <tr><td>現在の毎月返済額（元利均等）</td><td class="v" id="pmt">-</td></tr>
+      <tr><td>繰上返済後の残りの期間</td><td class="v" id="newTerm">-</td></tr>
+      <tr><td>短縮される期間（概算）</td><td class="v" id="saved">-</td></tr>
+      <tr><td>節約できる利息の目安</td><td class="v" id="interestSaved">-</td></tr>
+    </table>
+    <p class="note" style="margin-top:10px">この計算は概算です。最終回の返済額の調整は行っておらず、端数の関係で実際の短縮期間・利息額とは差が出ます。金利は残り期間を通じて一定と仮定しています（変動金利の将来の変動は考慮していません）。繰上返済手数料や、住宅ローン控除への影響も含んでいません。実際の条件は借入先金融機関でご確認ください。</p>
+  </div>
+
+  <footer>入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+
+<script>
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const yen = n => Math.round(n).toLocaleString("ja-JP") + " 円";
+function monthlyPayment(P, annualRate, months){
+  const r = annualRate / 12;
+  if(P <= 0 || months <= 0) return 0;
+  if(r === 0) return P / months;
+  const f = Math.pow(1 + r, months);
+  return P * r * f / (f - 1);
+}
+function monthsFor(P, annualRate, pmt){
+  const r = annualRate / 12;
+  if(P <= 0) return 0;
+  if(r === 0) return P / pmt;
+  if(pmt <= r * P) return Infinity; // 返済額が利息以下では完済しない
+  return Math.log(pmt / (pmt - r * P)) / Math.log(1 + r);
+}
+function fmtTerm(months){
+  if(!isFinite(months)) return "完済しません";
+  const m = Math.round(months);
+  return Math.floor(m / 12) + " 年 " + (m % 12) + " か月（約" + m.toLocaleString("ja-JP") + "回）";
+}
+function calc(){
+  const B = num(balanceEl.value), rate = num(rateEl.value) / 100, yrs = num(yearsEl.value), pre = num(prepayEl.value);
+  const nOld = Math.round(yrs * 12);
+  const pmt = monthlyPayment(B, rate, nOld);
+  const oldInterest = pmt * nOld - B;
+  const newB = Math.max(B - pre, 0);
+  const nNew = monthsFor(newB, rate, pmt);
+  const newInterest = isFinite(nNew) ? Math.max(pmt * nNew - newB, 0) : Infinity;
+  pmtEl.textContent = yen(pmt);
+  newTermEl.textContent = fmtTerm(nNew);
+  savedEl.textContent = isFinite(nNew) ? "約 " + Math.max(Math.round(nOld - nNew), 0).toLocaleString("ja-JP") + " か月" : "-";
+  interestSavedEl.textContent = isFinite(newInterest) ? "約 " + yen(Math.max(oldInterest - newInterest, 0)) : "-";
+}
+const balanceEl = document.getElementById("balance"), rateEl = document.getElementById("rate"),
+      yearsEl = document.getElementById("years"), prepayEl = document.getElementById("prepay");
+const pmtEl = document.getElementById("pmt"), newTermEl = document.getElementById("newTerm"),
+      savedEl = document.getElementById("saved"), interestSavedEl = document.getElementById("interestSaved");
+[balanceEl, rateEl, yearsEl, prepayEl].forEach(e => e.addEventListener("input", calc));
+calc();
+</script>
+</body>
+</html>

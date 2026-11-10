@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ふるさと納税 控除上限額の目安｜年収と家族構成から計算</title>
+<meta name="description" content="給与年収と家族構成から、ふるさと納税で実質負担2,000円に収まる寄付上限額の目安を計算する無料ツールです。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#059669; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .f label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .f input,.f select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+  .big{font-size:32px;font-weight:900;text-align:center;margin:8px 0 2px}
+  .sub2{text-align:center;color:var(--sub);font-size:14px}
+  .note{font-size:13px;color:var(--sub)}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>ふるさと納税 控除上限額の目安</h1>
+    <p>給与収入のみの会社員で、ふるさと納税以外の控除がない場合の目安です。</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="f"><label>年収（給与収入・円）</label><input id="income" type="number" min="0" step="100000" value="5000000"></div>
+      <div class="f"><label>家族構成</label>
+        <select id="family">
+          <option value="single">独身</option>
+          <option value="spouse">配偶者あり（共働きなし）</option>
+          <option value="high">配偶者＋高校生1人</option>
+          <option value="univ">配偶者＋大学生1人</option>
+        </select>
+      </div>
+    </div>
+    <div class="big" id="limit">-</div>
+    <div class="sub2">控除上限額の目安（この金額までの寄付なら、原則として実質負担は2,000円に収まります）</div>
+  </div>
+
+  <div class="card">
+    <p class="note" style="margin:0"><b>実質負担2,000円とは</b>：ふるさと納税は、寄付額のうち2,000円を超える部分が所得税・住民税から控除される制度です。控除には上限があり、上限以内の寄付であれば自己負担は2,000円で済みますが、上限を超えた分は控除されず、そのまま自己負担になります。<br><br>
+    <b>ご注意</b>：住宅ローン控除・医療費控除など他の控除がある場合は上限額は下がります。また、共働き世帯・自営業・年金収入がある場合なども結果が変わります。正確な額は、お住まいの自治体や公式のシミュレーターでご確認ください。本ツールの値は目安表をもとにした概算です。</p>
+  </div>
+
+  <footer>入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+
+<script>
+const TABLES = {
+  single: [[300,28000],[400,42000],[500,61000],[600,77000],[700,108000],[800,129000],[900,151000],[1000,176000]],
+  spouse: [[400,33000],[500,49000],[600,69000],[700,89000],[800,124000],[900,145000],[1000,166000]]
+};
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+function interp(table, man){ // man = income in 万円
+  if(man <= table[0][0]) return table[0][1];
+  if(man >= table[table.length-1][0]) return table[table.length-1][1];
+  for(let i = 0; i < table.length - 1; i++){
+    const [x0,y0] = table[i], [x1,y1] = table[i+1];
+    if(man >= x0 && man <= x1) return y0 + (y1 - y0) * (man - x0) / (x1 - x0);
+  }
+  return table[table.length-1][1];
+}
+function calc(){
+  const man = num(incomeEl.value) / 10000;
+  const fam = familyEl.value;
+  let v;
+  if(fam === "single") v = interp(TABLES.single, man);
+  else {
+    const base = interp(TABLES.spouse, man);
+    if(fam === "spouse") v = base;
+    else if(fam === "high") v = Math.round(base * 0.87 / 1000) * 1000;
+    else v = Math.round(base * 0.75 / 1000) * 1000;
+  }
+  limitEl.textContent = "約 " + Math.round(v).toLocaleString("ja-JP") + " 円";
+}
+const incomeEl = document.getElementById("income"), familyEl = document.getElementById("family"), limitEl = document.getElementById("limit");
+[incomeEl, familyEl].forEach(e => e.addEventListener("input", calc));
+calc();
+</script>
+</body>
+</html>

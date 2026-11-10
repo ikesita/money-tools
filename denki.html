@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>電気料金の目安計算機｜基本料金・従量料金・再エネ賦課金から試算</title>
+<meta name="description" content="基本料金、従量単価、使用量（kWh）と再エネ賦課金単価から、1か月の電気料金の目安を計算する無料ツールです。単価は変更できます。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#d97706; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .f label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .f input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td{padding:6px 0;color:var(--sub)} td.v{text-align:right;color:var(--ink);font-weight:800}
+  .big{font-size:30px;font-weight:900;text-align:center;margin:8px 0 2px}
+  .note{font-size:13px;color:var(--sub)}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>電気料金の目安</h1>
+    <p>ご契約の単価を入力して、1か月の電気料金の目安を計算します。単価は検針票や契約内容でご確認のうえ変更できます。</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="f"><label>基本料金（円／月）</label><input id="base" type="number" min="0" step="10" value="1200"></div>
+      <div class="f"><label>従量単価（円／kWh）</label><input id="unit" type="number" min="0" step="0.1" value="29.8"></div>
+      <div class="f"><label>使用量（kWh）</label><input id="kwh" type="number" min="0" step="1" value="300"></div>
+      <div class="f"><label>再エネ賦課金 単価（円／kWh）※初期値は目安、年度で変わります</label><input id="levy" type="number" min="0" step="0.01" value="3.98"></div>
+    </div>
+    <div class="big" id="total">-</div>
+    <div style="text-align:center;color:var(--sub);font-size:14px">合計の目安（1か月）</div>
+  </div>
+
+  <div class="card">
+    <table>
+      <tr><td>基本料金</td><td class="v" id="baseOut">-</td></tr>
+      <tr><td>従量料金（単価 × 使用量）</td><td class="v" id="usageOut">-</td></tr>
+      <tr><td>再エネ賦課金（単価 × 使用量）</td><td class="v" id="levyOut">-</td></tr>
+    </table>
+    <p class="note" style="margin-top:10px">この計算には燃料費調整額を含んでいません。実際の電気料金は、契約プラン（段階制料金かどうか）、燃料費調整額、各種割引などにより異なります。従量単価が使用量によって変わる段階制プランの場合は、平均的な単価を入力して目安としてご利用ください。再エネ賦課金（再生可能エネルギー発電促進賦課金）の単価は年度ごとに決定されます。</p>
+  </div>
+
+  <footer>入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+
+<script>
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const yen = n => Math.round(n).toLocaleString("ja-JP") + " 円";
+function calc(){
+  const base = num(baseEl.value), usage = num(unitEl.value) * num(kwhEl.value), levy = num(levyEl.value) * num(kwhEl.value);
+  baseOutEl.textContent = yen(base);
+  usageOutEl.textContent = yen(usage);
+  levyOutEl.textContent = yen(levy);
+  totalEl.textContent = "約 " + yen(base + usage + levy);
+}
+const baseEl = document.getElementById("base"), unitEl = document.getElementById("unit"),
+      kwhEl = document.getElementById("kwh"), levyEl = document.getElementById("levy");
+const baseOutEl = document.getElementById("baseOut"), usageOutEl = document.getElementById("usageOut"),
+      levyOutEl = document.getElementById("levyOut"), totalEl = document.getElementById("total");
+[baseEl, unitEl, kwhEl, levyEl].forEach(e => e.addEventListener("input", calc));
+calc();
+</script>
+</body>
+</html>

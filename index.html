@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>お金の計算ツール集｜税金・年金・ローン・公共料金の目安を計算</title>
+<meta name="description" content="ふるさと納税の控除上限、退職金の税金、年金受給額、雇用保険料、住宅ローン繰上返済、電気料金など、お金の目安をブラウザで計算できる無料ツール集です。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#2563eb; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:860px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:27px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 20px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .tool{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;text-decoration:none;color:var(--ink);box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .tool:hover{border-color:var(--acc)}
+  .tool .t{font-weight:800;font-size:16.5px;margin-bottom:4px}
+  .tool .d{color:var(--sub);font-size:13.5px}
+  footer{color:var(--sub);font-size:12.5px;margin-top:26px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>お金の計算ツール集</h1>
+    <p>税金・年金・ローン・公共料金など、暮らしのお金の「目安」をその場で計算できます。すべての計算はブラウザ内で行われ、入力内容が送信されることはありません。</p>
+  </header>
+  <div class="grid">
+    <a class="tool" href="furusato.html"><div class="t">ふるさと納税 控除上限額の目安</div><div class="d">年収と家族構成から、自己負担2,000円に収まる寄付上限の目安を計算します</div></a>
+    <a class="tool" href="taishoku.html"><div class="t">退職金にかかる税金</div><div class="d">退職所得控除・所得税・住民税から、手取りの目安を計算します</div></a>
+    <a class="tool" href="nenkin.html"><div class="t">年金受給額の目安</div><div class="d">平均年収と加入年数から、老齢基礎年金＋厚生年金の月額目安を計算します</div></a>
+    <a class="tool" href="koyou.html"><div class="t">雇用保険料計算機</div><div class="d">月給と業種から、労働者負担の雇用保険料（月額・年額）を計算します</div></a>
+    <a class="tool" href="kurikoshi.html"><div class="t">住宅ローン繰上返済シミュレーション</div><div class="d">期間短縮型の繰上返済で、短縮される期間と節約できる利息の目安を計算します</div></a>
+    <a class="tool" href="denki.html"><div class="t">電気料金の目安</div><div class="d">基本料金・従量単価・使用量と再エネ賦課金から、月額の目安を計算します</div></a>
+  </div>
+  <footer>各ツールの結果はあくまで目安です。税制・料率・制度は年度により改正されますので、正式な金額は公式情報でご確認ください。入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+</body>
+</html>
