@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>失業手当（基本手当）の目安計算機｜日額・給付日数・受給総額を簡易計算</title>
+<meta name="description" content="離職前6か月の給与総額、年齢、雇用保険の被保険者期間、離職理由から、失業手当（雇用保険の基本手当）の日額・所定給付日数・受給総額の目安を計算する無料ツールです。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#b45309; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .f label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .f input,.f select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td{padding:6px 0;color:var(--sub)} td.v{text-align:right;color:var(--ink);font-weight:800}
+  .note{font-size:13px;color:var(--sub)}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>失業手当（基本手当）の目安計算機</h1>
+    <p>雇用保険の基本手当について、日額・所定給付日数・受給総額の目安を簡易計算します。</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="f"><label>離職前6か月の給与総額（円）※ボーナス除く</label><input id="total" type="number" min="0" step="10000" value="1800000"></div>
+      <div class="f"><label>年齢（離職時）</label><input id="age" type="number" min="15" max="100" step="1" value="35"></div>
+      <div class="f"><label>雇用保険の被保険者期間</label>
+        <select id="period">
+          <option value="under1">1年未満</option>
+          <option value="p1">1年以上5年未満</option>
+          <option value="p5" selected>5年以上10年未満</option>
+          <option value="p10">10年以上20年未満</option>
+          <option value="p20">20年以上</option>
+        </select>
+      </div>
+      <div class="f"><label>離職理由</label>
+        <select id="reason">
+          <option value="jiko">自己都合</option>
+          <option value="kaisha" selected>会社都合（倒産・解雇など）</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <table>
+      <tr><td>賃金日額</td><td class="v" id="wageDaily">-</td></tr>
+      <tr><td>給付率</td><td class="v" id="rateUsed">-</td></tr>
+      <tr><td>基本手当日額</td><td class="v" id="daily">-</td></tr>
+      <tr><td>所定給付日数</td><td class="v" id="days">-</td></tr>
+      <tr><td>受給総額の目安</td><td class="v" id="totalAmt">-</td></tr>
+    </table>
+    <p class="note" id="warn" style="margin-top:10px"></p>
+    <p class="note" style="margin-top:10px">計算方法（簡易版）：賃金日額＝離職前6か月の給与総額÷180。給付率は賃金日額に応じて80％（低賃金）から50％へ段階的に下がり、高賃金帯では45％になる仕組みを、本ツールでは「2,710円未満は80％／2,710〜5,020円未満は80→50％へ線形／5,020〜12,580円未満は50％／12,580円以上は45％（60歳未満の区分による簡略化）」として近似しています。基本手当日額には年齢区分ごとの上限があり、本ツールでは令和7年8月改定値の概数（29歳以下7,192円／30〜44歳7,990円／45〜59歳8,790円／60〜64歳7,634円）を上限の目安として適用しています。所定給付日数は、会社都合（特定受給資格者）を年齢区分で簡略化した表によります。就職困難者・特定理由離職者などは扱いが異なり、実際の日額・日数は離職票の内容やハローワークの判定で決まります。65歳以上は高年齢求職者給付金（一時金）の対象となり、本ツールの対象外です。正式な金額はハローワークでご確認ください。</p>
+  </div>
+
+  <footer>入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+
+<script>
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const yen = n => Math.round(n).toLocaleString("ja-JP") + " 円";
+
+function benefitRate(w){
+  if(w < 2710) return 0.80;
+  if(w < 5020) return 0.80 - 0.30 * (w - 2710) / (5020 - 2710);
+  if(w < 12580) return 0.50;
+  return 0.45;
+}
+function dailyCap(age){
+  if(age <= 29) return 7192;
+  if(age <= 44) return 7990;
+  if(age <= 59) return 8790;
+  return 7634;
+}
+function ageBand(age){ // 0:<=29 1:30-34 2:35-44 3:45-59 4:60+
+  if(age <= 29) return 0;
+  if(age <= 34) return 1;
+  if(age <= 44) return 2;
+  if(age <= 59) return 3;
+  return 4;
+}
+// 会社都合（特定受給資格者・簡易版）: [期間][年齢帯]
+const KAISHA = {
+  p1:  [90, 120, 150, 180, 150],
+  p5:  [120, 180, 180, 240, 180],
+  p10: [180, 210, 240, 270, 210],
+  p20: [180, 270, 270, 330, 240]
+};
+function benefitDays(reason, period, age){
+  if(period === "under1") return null; // 受給要件の確認が必要なため本ツールでは日数を出さない
+  if(reason === "jiko"){
+    if(period === "p10") return 120;
+    if(period === "p20") return 150;
+    return 90;
+  }
+  return KAISHA[period][ageBand(age)];
+}
+
+function calc(){
+  const total = num(totalEl.value);
+  const age = num(ageEl.value);
+  const wage = total / 180;
+  const rate = benefitRate(wage);
+  const rawDaily = Math.floor(wage * rate);
+  const cap = dailyCap(age);
+  const daily = Math.min(rawDaily, cap);
+  const days = benefitDays(reasonEl.value, periodEl.value, age);
+
+  wageEl.textContent = yen(wage);
+  rateEl.textContent = (rate * 100).toFixed(1) + " ％";
+  dailyEl.textContent = yen(daily) + (rawDaily > cap ? "（上限の目安を適用）" : "");
+  if(days === null){
+    daysEl.textContent = "—";
+    totalEl2.textContent = "—";
+    warnEl.textContent = "被保険者期間が1年未満の場合、受給には別途要件があります（自己都合は原則として離職前2年間に12か月以上、会社都合・特定理由は離職前1年間に6か月以上の被保険者期間が必要）。要件を満たすかどうかはハローワークでご確認ください。";
+  } else {
+    daysEl.textContent = days + " 日";
+    totalEl2.textContent = yen(daily * days);
+    warnEl.textContent = age >= 65 ? "65歳以上の方は高年齢求職者給付金（一時金）の対象となり、この計算の対象外です。表示は60〜64歳の区分による参考値です。" : "";
+  }
+}
+const totalEl = document.getElementById("total"), ageEl = document.getElementById("age"),
+      periodEl = document.getElementById("period"), reasonEl = document.getElementById("reason");
+const wageEl = document.getElementById("wageDaily"), rateEl = document.getElementById("rateUsed"),
+      dailyEl = document.getElementById("daily"), daysEl = document.getElementById("days"),
+      totalEl2 = document.getElementById("totalAmt"), warnEl = document.getElementById("warn");
+[totalEl, ageEl, periodEl, reasonEl].forEach(e => e.addEventListener("input", calc));
+calc();
+</script>
+</body>
+</html>

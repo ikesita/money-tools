@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iDeCo節税シミュレーション｜掛金の所得控除で減る税金の目安</title>
+<meta name="description" content="iDeCo（個人型確定拠出年金）の毎月の拠出額と課税所得から、所得税・住民税の節税額（年額と60歳までの累計目安）を計算する無料ツールです。運用益は含みません。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#b45309; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .f label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .f input,.f select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td{padding:6px 0;color:var(--sub)} td.v{text-align:right;color:var(--ink);font-weight:800}
+  .note{font-size:13px;color:var(--sub)}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>iDeCo 節税シミュレーション</h1>
+    <p>iDeCoの掛金は全額が所得控除の対象です。所得税と住民税がいくら軽くなるか、目安を計算します。</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="f"><label>現在の年齢</label><input id="age" type="number" min="18" max="64" step="1" value="40"></div>
+      <div class="f"><label>毎月の拠出額（円）</label><input id="monthly" type="number" min="0" step="1000" value="23000"></div>
+      <div class="f"><label>課税所得（万円）※年収ではなく控除後の金額</label><input id="income" type="number" min="0" step="10" value="400"></div>
+    </div>
+    <p class="note" style="margin-top:10px">課税所得は、源泉徴収票の「給与所得控除後の金額」から社会保険料控除・基礎控除などを差し引いた金額です。拠出限度額は加入区分（自営業・会社員・公務員・専業主婦／主夫など）や勤務先の年金制度（企業型DC・DBの有無）によって異なりますので、入力額がご自身の上限内かは別途ご確認ください。</p>
+  </div>
+
+  <div class="card">
+    <table>
+      <tr><td>年間拠出額</td><td class="v" id="annual">-</td></tr>
+      <tr><td>適用される所得税率</td><td class="v" id="taxRate">-</td></tr>
+      <tr><td>節税額の目安（1年あたり）</td><td class="v" id="saveYear">-</td></tr>
+      <tr><td>拠出できる年数（60歳まで）</td><td class="v" id="years">-</td></tr>
+      <tr><td>節税額の累計目安（60歳まで）</td><td class="v" id="saveTotal">-</td></tr>
+    </table>
+    <p class="note" id="warn" style="margin-top:10px"></p>
+    <p class="note" style="margin-top:10px">計算方法：節税額（年）＝年間拠出額×（所得税率＋住民税10％）。所得税率は課税所得の区分（195万円以下5％／330万円以下10％／695万円以下20％／900万円以下23％／1,800万円以下33％／4,000万円以下40％／4,000万円超45％）で判定しています。この計算には運用益（投資信託などの値上がり益）や、受け取り時の税金、手数料は含まれていません。課税所得が拠出額を下回る場合など、実際の節税額は小さくなることがあります。あくまで目安としてご利用ください。</p>
+  </div>
+
+  <footer>入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+
+<script>
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const yen = n => Math.round(n).toLocaleString("ja-JP") + " 円";
+
+function incomeTaxRate(incomeMan){ // 課税所得（万円）→ 所得税率
+  if(incomeMan <= 195) return 0.05;
+  if(incomeMan <= 330) return 0.10;
+  if(incomeMan <= 695) return 0.20;
+  if(incomeMan <= 900) return 0.23;
+  if(incomeMan <= 1800) return 0.33;
+  if(incomeMan <= 4000) return 0.40;
+  return 0.45;
+}
+
+function calc(){
+  const age = num(ageEl.value);
+  const monthly = num(monthlyEl.value);
+  const income = num(incomeEl.value);
+  const annual = monthly * 12;
+  const rate = incomeTaxRate(income);
+  const saveYear = annual * (rate + 0.10);
+  const years = Math.max(0, 60 - age);
+  annualEl.textContent = yen(annual);
+  rateEl.textContent = (rate * 100) + " ％（＋住民税10％）";
+  saveYearEl.textContent = yen(saveYear);
+  yearsEl.textContent = years + " 年";
+  totalEl.textContent = yen(saveYear * years);
+  warnEl.textContent = age >= 60 ? "60歳以上のため、この計算では今後の拠出年数を0年としています（加入者資格や拠出可否は制度の条件をご確認ください）。" : "";
+}
+const ageEl = document.getElementById("age"), monthlyEl = document.getElementById("monthly"),
+      incomeEl = document.getElementById("income");
+const annualEl = document.getElementById("annual"), rateEl = document.getElementById("taxRate"),
+      saveYearEl = document.getElementById("saveYear"), yearsEl = document.getElementById("years"),
+      totalEl = document.getElementById("saveTotal"), warnEl = document.getElementById("warn");
+[ageEl, monthlyEl, incomeEl].forEach(e => e.addEventListener("input", calc));
+calc();
+</script>
+</body>
+</html>
