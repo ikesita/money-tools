@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>年末調整の還付金の目安｜給与収入から所得税を簡易計算</title>
+<meta name="description" content="給与収入・源泉徴収済みの所得税額・社会保険料などから、年末調整で戻ってくる還付金（または追加徴収）の目安を簡易計算できる無料ツールです。あくまで簡易な目安です。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#b45309; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .f label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .f input,.f select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td{padding:6px 0;color:var(--sub)} td.v{text-align:right;color:var(--ink);font-weight:800}
+  .big{font-size:22px;font-weight:800;color:var(--ink)}
+  .warn{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 14px;font-size:13.5px;color:#7f1d1d}
+  .note{font-size:13px;color:var(--sub)}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>年末調整の還付金の目安（簡易版）</h1>
+    <p>給与収入と源泉徴収済みの所得税額などから、年末調整での還付金（戻ってくる金額）の目安を簡易計算します。</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="f"><label>給与収入（円）※額面の年収総額</label><input id="income" type="number" min="0" step="10000" value="5000000"></div>
+      <div class="f"><label>源泉徴収済みの所得税額（円）※1年間に給与から天引きされた合計</label><input id="withheld" type="number" min="0" step="1000" value="150000"></div>
+      <div class="f"><label>社会保険料の合計（円）※健康保険・厚生年金・雇用保険など</label><input id="shakai" type="number" min="0" step="10000" value="750000"></div>
+      <div class="f"><label>その他の所得控除の合計（円）※生命保険料控除・扶養控除など</label><input id="other" type="number" min="0" step="10000" value="0"></div>
+    </div>
+    <p class="big" id="headline" style="margin:14px 0 0">-</p>
+  </div>
+
+  <div class="card">
+    <table>
+      <tr><td>給与所得控除</td><td class="v" id="rKyuyoDed">-</td></tr>
+      <tr><td>給与所得（収入 − 給与所得控除）</td><td class="v" id="rKyuyoInc">-</td></tr>
+      <tr><td>課税所得（基礎控除48万円・社会保険料・その他控除を差し引き、千円未満切り捨て）</td><td class="v" id="rTaxable">-</td></tr>
+      <tr><td>所得税額（復興特別所得税2.1％込み）</td><td class="v" id="rTax">-</td></tr>
+      <tr><td>還付の目安（源泉徴収済額 − 所得税額）</td><td class="v" id="rRefund">-</td></tr>
+    </table>
+    <p class="note" style="margin-top:10px">所得税額が源泉徴収済額を上回る場合は、差額が追加で徴収される目安になります。住宅ローン控除（住宅借入金等特別控除）などはこの簡易計算には含まれていません。</p>
+  </div>
+
+  <div class="warn">
+    <strong>必ずお読みください：</strong>このツールは簡易計算による目安です。配偶者控除・配偶者特別控除の段階計算、扶養親族の人数に応じた控除、生命保険料控除の計算式、住宅ローン控除、所得金額調整控除などは反映していないため、実際の年末調整の結果とは異なります。正式な金額は勤務先の源泉徴収票や国税庁の案内でご確認ください。
+  </div>
+
+  <footer>入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+
+<script>
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const yen = n => Math.round(n).toLocaleString("ja-JP") + " 円";
+
+// 給与所得控除（令和2年分以降）
+function kyuyoDeduction(income){
+  if(income <= 1625000) return 550000;
+  if(income <= 1800000) return income * 0.4 - 100000;
+  if(income <= 3600000) return income * 0.3 + 80000;
+  if(income <= 6600000) return income * 0.2 + 440000;
+  if(income <= 8500000) return income * 0.1 + 1100000;
+  return 1950000;
+}
+// 所得税の速算表
+function incomeTax(t){
+  if(t <= 0) return 0;
+  if(t <= 1950000) return t * 0.05;
+  if(t <= 3300000) return t * 0.10 - 97500;
+  if(t <= 6950000) return t * 0.20 - 427500;
+  if(t <= 9000000) return t * 0.23 - 636000;
+  if(t <= 18000000) return t * 0.33 - 1536000;
+  if(t <= 40000000) return t * 0.40 - 2796000;
+  return t * 0.45 - 4796000;
+}
+
+function calc(){
+  const income = num(document.getElementById("income").value);
+  const withheld = num(document.getElementById("withheld").value);
+  const shakai = num(document.getElementById("shakai").value);
+  const other = num(document.getElementById("other").value);
+
+  const ded = kyuyoDeduction(income);
+  const kyuyoInc = Math.max(0, income - ded);
+  let taxable = kyuyoInc - 480000 - shakai - other;
+  taxable = taxable <= 0 ? 0 : Math.floor(taxable / 1000) * 1000; // 千円未満切り捨て
+  const tax = Math.floor(incomeTax(taxable) * 1.021); // 復興特別所得税2.1％、円未満切り捨て
+  const refund = withheld - tax;
+
+  document.getElementById("rKyuyoDed").textContent = yen(ded);
+  document.getElementById("rKyuyoInc").textContent = yen(kyuyoInc);
+  document.getElementById("rTaxable").textContent = yen(taxable);
+  document.getElementById("rTax").textContent = yen(tax);
+  document.getElementById("rRefund").textContent = yen(refund);
+  document.getElementById("headline").textContent = refund >= 0
+    ? "還付金の目安は " + yen(refund) + " です"
+    : "追加徴収の目安は " + yen(-refund) + " です（還付はありません）";
+}
+["income","withheld","shakai","other"].forEach(id => document.getElementById(id).addEventListener("input", calc));
+calc();
+</script>
+</body>
+</html>

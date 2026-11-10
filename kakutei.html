@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>副業の確定申告 要否チェッカー｜20万円ルールの目安を確認</title>
+<meta name="description" content="本業の給与の有無と副業の所得金額から、確定申告が必要かどうかの目安をチェックできる無料ツールです。一般的な目安であり、個別判断は税務署・税理士へ。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#b45309; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .f label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .f input,.f select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td{padding:6px 0;color:var(--sub)} td.v{text-align:right;color:var(--ink);font-weight:800}
+  .big{font-size:22px;font-weight:800;color:var(--ink)}
+  .warn{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 14px;font-size:13.5px;color:#7f1d1d}
+  .note{font-size:13px;color:var(--sub)}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>副業の確定申告 要否チェッカー</h1>
+    <p>本業の給与の有無と、副業の所得金額・種類から、確定申告が必要かどうかの目安をチェックします。</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="f"><label>本業の給与がありますか</label>
+        <select id="hasSalary">
+          <option value="yes" selected>ある（会社員・パートなど）</option>
+          <option value="no">ない（副業の所得のみ）</option>
+        </select>
+      </div>
+      <div class="f"><label>副業の種類</label>
+        <select id="sideType">
+          <option value="business" selected>事業所得・雑所得（業務委託、フリーランス、ネット収入など）</option>
+          <option value="salary">給与収入（アルバイト・パートなど）</option>
+        </select>
+      </div>
+      <div class="f"><label>副業の金額（円）※事業・雑所得は「所得」、給与は「収入（額面）」</label><input id="amount" type="number" min="0" step="10000" value="250000"></div>
+    </div>
+    <p class="big" id="headline" style="margin:14px 0 0">-</p>
+    <p class="note" id="detail" style="margin-top:8px">-</p>
+  </div>
+
+  <div class="warn">
+    <strong>必ずお読みください：</strong>このツールは一般的な目安を示すものです。医療費控除やふるさと納税（ワンストップ特例の条件）を受ける場合、副業所得が20万円以下でも確定申告が必要になることがあります。また、本業の給与収入が2,000万円を超える場合など、ほかの条件で申告が必要になるケースもあります。個別の判断は、税務署・税理士などで必ずご確認ください。
+  </div>
+
+  <footer>入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+
+<script>
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+
+function calc(){
+  const hasSalary = document.getElementById("hasSalary").value;
+  const sideType = document.getElementById("sideType").value;
+  const amount = num(document.getElementById("amount").value);
+  let headline = "", detail = "";
+
+  if(hasSalary === "yes" && sideType === "salary"){
+    headline = "確定申告が必要です";
+    detail = "給与を2か所から受けている場合は、原則として確定申告が必要です（年末調整は主たる給与でしか行われません）。";
+  } else if(hasSalary === "yes" && sideType === "business"){
+    if(amount > 200000){
+      headline = "確定申告が必要です";
+      detail = "給与所得者で、給与以外の所得が20万円を超える場合は、所得税の確定申告が必要です。副業の所得 " + Math.round(amount).toLocaleString("ja-JP") + " 円は20万円を超えています。";
+    } else {
+      headline = "所得税の確定申告は不要ですが、住民税の申告が必要です";
+      detail = "給与以外の所得が20万円以下の場合、いわゆる「20万円ルール」により所得税の確定申告は不要です。ただし、このルールは所得税だけのもので、住民税には同様の免除がなく、お住まいの自治体への住民税の申告は必要です。";
+    }
+  } else if(hasSalary === "no" && sideType === "salary"){
+    if(amount > 1030000){
+      headline = "確定申告が必要です";
+      detail = "給与収入が103万円を超えると、給与所得控除（55万円）と基礎控除（48万円）の合計を超えるため、原則として確定申告が必要です。勤務先で年末調整を受けている場合は不要なこともあります。";
+    } else {
+      headline = "確定申告は不要な可能性が高いです";
+      detail = "給与収入103万円以下は、給与所得控除と基礎控除の範囲内のため、ほかに所得がなければ課税されません。ただし年末調整を受けていない場合は、源泉徴収された税金の還付のために申告すると戻ってくることがあります。";
+    }
+  } else { // 給与なし・事業/雑所得
+    if(amount > 480000){
+      headline = "確定申告が必要です";
+      detail = "所得が基礎控除（48万円）を超える場合は、所得税の確定申告が必要です。";
+    } else {
+      headline = "基礎控除48万円以下のため、他に所得がなければ確定申告は不要です";
+      detail = "所得が基礎控除（48万円）以下で、ほかに所得がなければ、所得税は課税されません。ただし、住民税の申告が必要な場合や、青色申告の承認を受けている場合などは扱いが異なることがあります。";
+    }
+  }
+
+  document.getElementById("headline").textContent = headline;
+  document.getElementById("detail").textContent = detail;
+}
+["hasSalary","sideType","amount"].forEach(id => document.getElementById(id).addEventListener("input", calc));
+calc();
+</script>
+</body>
+</html>

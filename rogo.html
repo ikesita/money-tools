@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>老後資金の不足額シミュレーション｜年金と生活費の差額から計算</title>
+<meta name="description" content="老後の毎月の生活費と年金額の差額から、老後期間を通じた不足総額と、追加で必要な準備額の目安を計算できる無料ツールです。あくまで単純計算の目安です。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#b45309; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .f label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .f input,.f select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td{padding:6px 0;color:var(--sub)} td.v{text-align:right;color:var(--ink);font-weight:800}
+  .big{font-size:22px;font-weight:800;color:var(--ink)}
+  .warn{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 14px;font-size:13.5px;color:#7f1d1d}
+  .note{font-size:13px;color:var(--sub)}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>老後資金の不足額シミュレーション</h1>
+    <p>老後の生活費と年金額の毎月の差額から、老後期間全体での不足額と、追加で必要な準備額の目安を計算します。</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="f"><label>老後の毎月の生活費（円）</label><input id="living" type="number" min="0" step="10000" value="280000"></div>
+      <div class="f"><label>毎月の年金額（円）※夫婦2人分などの合計で入力</label><input id="pension" type="number" min="0" step="10000" value="200000"></div>
+      <div class="f"><label>老後期間（年）※例：65歳から90歳までなら25年</label><input id="years" type="number" min="0" step="1" value="25"></div>
+      <div class="f"><label>現在の貯蓄・資産（円）※老後に使える分</label><input id="assets" type="number" min="0" step="100000" value="5000000"></div>
+    </div>
+    <p class="big" id="headline" style="margin:14px 0 0">-</p>
+  </div>
+
+  <div class="card">
+    <table>
+      <tr><td>毎月の不足額（生活費 − 年金額）</td><td class="v" id="rMonthly">-</td></tr>
+      <tr><td>不足総額（毎月の不足額 × 12か月 × 老後期間）</td><td class="v" id="rTotal">-</td></tr>
+      <tr><td>追加で必要な準備額（不足総額 − 現在の資産）</td><td class="v" id="rNeed">-</td></tr>
+    </table>
+    <p class="note" style="margin-top:10px">年金額が生活費以上の場合は、毎月の収支上は不足しない計算になります。ただし、医療費・介護費・住宅の修繕費などの臨時支出は含まれていません。</p>
+  </div>
+
+  <div class="warn">
+    <strong>必ずお読みください：</strong>このツールは、物価上昇（インフレ）や年金制度の改定、運用による増減、税金・社会保険料を考慮しない単純計算の目安です。実際の老後資金は、寿命、健康状態、住まいの形態などで大きく変わります。具体的な資産計画は、ファイナンシャルプランナーなどの専門家への相談もご検討ください。
+  </div>
+
+  <footer>入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+
+<script>
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const yen = n => Math.round(n).toLocaleString("ja-JP") + " 円";
+const man = n => {
+  const v = n / 10000;
+  return (Number.isInteger(v) ? v.toLocaleString("ja-JP") : v.toLocaleString("ja-JP", {maximumFractionDigits: 1})) + " 万円";
+};
+
+function calc(){
+  const living = num(document.getElementById("living").value);
+  const pension = num(document.getElementById("pension").value);
+  const years = num(document.getElementById("years").value);
+  const assets = num(document.getElementById("assets").value);
+
+  const monthly = Math.max(0, living - pension);
+  const total = monthly * 12 * years;
+  const need = Math.max(0, total - assets);
+
+  document.getElementById("rMonthly").textContent = yen(monthly);
+  document.getElementById("rTotal").textContent = yen(total) + "（約 " + man(total) + "）";
+  document.getElementById("rNeed").textContent = yen(need) + "（約 " + man(need) + "）";
+  document.getElementById("headline").textContent = monthly <= 0
+    ? "年金額が生活費以上のため、毎月の収支では不足しません"
+    : "不足総額は約 " + man(total) + "、追加で必要な準備額は約 " + man(need) + " です";
+}
+["living","pension","years","assets"].forEach(id => document.getElementById(id).addEventListener("input", calc));
+calc();
+</script>
+</body>
+</html>

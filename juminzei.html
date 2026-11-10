@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>住民税の目安｜所得割・均等割の簡易計算</title>
+<meta name="description" content="課税所得から、住民税（所得割10％＋均等割）の年額の目安を簡易計算できる無料ツールです。標準税率による簡易な目安です。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#b45309; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .f label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .f input,.f select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td{padding:6px 0;color:var(--sub)} td.v{text-align:right;color:var(--ink);font-weight:800}
+  .big{font-size:22px;font-weight:800;color:var(--ink)}
+  .warn{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 14px;font-size:13.5px;color:#7f1d1d}
+  .note{font-size:13px;color:var(--sub)}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>住民税の目安（簡易版）</h1>
+    <p>課税所得から、住民税の年額（所得割＋均等割）の目安を、標準税率で簡易計算します。</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="f"><label>課税所得（円）※各種控除を差し引いたあとの金額</label><input id="taxable" type="number" min="0" step="10000" value="3000000"></div>
+    </div>
+    <p class="big" id="headline" style="margin:14px 0 0">-</p>
+  </div>
+
+  <div class="card">
+    <table>
+      <tr><td>所得割（課税所得 × 10％）</td><td class="v" id="rShotokuWari">-</td></tr>
+      <tr><td>均等割（標準税率の目安）</td><td class="v" id="rKintoWari">-</td></tr>
+      <tr><td>調整控除（簡易計算分）</td><td class="v" id="rChosei">-</td></tr>
+      <tr><td>住民税の合計（年額の目安）</td><td class="v" id="rTotal">-</td></tr>
+    </table>
+    <p class="note" style="margin-top:10px">給与所得者の場合、この年額が翌年6月から翌々年5月までの12回に分けて給与から天引き（特別徴収）されるのが一般的です。</p>
+  </div>
+
+  <div class="warn">
+    <strong>必ずお読みください：</strong>このツールは標準税率にもとづく簡易な目安です。均等割額や税率は自治体によって異なる場合があり、調整控除は実際の計算（人的控除の差額にもとづく計算）とは異なる簡易な扱いをしています。ふるさと納税などの税額控除も反映していません。正式な金額は、お住まいの自治体から届く住民税決定通知書でご確認ください。
+  </div>
+
+  <footer>入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+
+<script>
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const yen = n => Math.round(n).toLocaleString("ja-JP") + " 円";
+
+function calc(){
+  const taxable = Math.max(0, num(document.getElementById("taxable").value));
+  const shotokuWari = Math.floor(taxable * 0.10);
+  const kintoWari = 5000;
+  const chosei = taxable > 0 ? 2500 : 0; // 調整控除の簡易分（課税所得がある場合のみ）
+  const total = Math.max(0, shotokuWari + kintoWari - chosei);
+
+  document.getElementById("rShotokuWari").textContent = yen(shotokuWari);
+  document.getElementById("rKintoWari").textContent = yen(kintoWari);
+  document.getElementById("rChosei").textContent = chosei > 0 ? "− " + yen(chosei) : yen(0);
+  document.getElementById("rTotal").textContent = yen(total);
+  document.getElementById("headline").textContent = "住民税の目安は 年額 " + yen(total) + " です";
+}
+document.getElementById("taxable").addEventListener("input", calc);
+calc();
+</script>
+</body>
+</html>
