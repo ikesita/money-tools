@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ボーナス手取りの目安（都道府県別）｜協会けんぽの健康保険料率で計算</title>
+<meta name="description" content="賞与（ボーナス）の額面から、勤務先の都道府県の協会けんぽ健康保険料率を使って社会保険料と所得税を差し引いた手取り額の目安を計算する無料ツールです。47都道府県の令和8年度料率つき。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#b45309; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .f label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .f input,.f select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+  .card h2{font-size:17px;margin:0 0 12px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td,th{padding:6px 0;color:var(--sub);text-align:left}
+  td.v,th.v{text-align:right;color:var(--ink);font-weight:800}
+  tr.total td{border-top:2px solid var(--line);font-size:17px;color:var(--ink);font-weight:800}
+  tr.total td.v{font-size:19px}
+  .rate td,.rate th{padding:5px 0;border-bottom:1px solid #eef0f4}
+  .note{font-size:13px;color:var(--sub)}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "ボーナス手取りの目安（都道府県別）",
+  "url": "https://ikesita.github.io/money-tools/bonus-pref.html",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any",
+  "inLanguage": "ja",
+  "description": "賞与（ボーナス）の額面から、勤務先の都道府県の協会けんぽ健康保険料率を使って社会保険料と所得税を差し引いた手取り額の目安を計算する無料ツールです。47都道府県の令和8年度料率つき。",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "JPY"
+  },
+  "isAccessibleForFree": true
+}
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>ボーナス手取りの目安（都道府県別）</h1>
+    <p>賞与（ボーナス）の額面から、勤務先の都道府県の協会けんぽ健康保険料率（令和8年度）を使って社会保険料と所得税を差し引いた手取り額の目安を計算します。</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="f"><label>賞与額（額面・円）</label><input id="bonus" type="number" min="0" step="1000" value="500000"></div>
+      <div class="f"><label>勤務先の都道府県</label><select id="pref"></select></div>
+      <div class="f"><label>年齢区分</label>
+        <select id="age">
+          <option value="u40" selected>40歳未満（介護保険料なし）</option>
+          <option value="care">40〜64歳（介護保険料あり）</option>
+        </select>
+      </div>
+      <div class="f"><label>所得税率（％）</label><input id="taxRate" type="number" min="0" max="100" step="0.01" value="10.21"></div>
+    </div>
+    <p class="note" style="margin-top:10px">所得税率の初期値10.21％は一例です。賞与の所得税率は「前月の給与（社会保険料控除後）」と扶養人数で決まるため、実際の税率は人によって変わります。住民税は賞与から直接差し引かれないため、この計算には含めていません。</p>
+  </div>
+
+  <div class="card">
+    <h2>計算結果の目安</h2>
+    <table>
+      <tr><td>健康保険料（<span id="kenpoRate">-</span>％の半分）</td><td class="v" id="kenpo">-</td></tr>
+      <tr><td>介護保険料（40〜64歳のみ・1.62％の半分）</td><td class="v" id="kaigo">-</td></tr>
+      <tr><td>厚生年金保険料（18.3％の半分）</td><td class="v" id="nenkin">-</td></tr>
+      <tr><td>雇用保険料（本人負担0.6％）</td><td class="v" id="koyo">-</td></tr>
+      <tr><td>社会保険料の合計</td><td class="v" id="shaho">-</td></tr>
+      <tr><td>所得税（課税対象額 × 所得税率）</td><td class="v" id="tax">-</td></tr>
+      <tr class="total"><td>手取り額の目安</td><td class="v" id="net">-</td></tr>
+    </table>
+    <p class="note" style="margin-top:10px">例：東京都・賞与50万円・40歳未満の場合、社会保険料は73,375円、所得税は43,558円、手取りは383,067円です。40〜64歳の場合は社会保険料77,425円・所得税43,145円・手取り379,430円です。佐賀県（料率10.55％）・賞与50万円・40歳未満の場合は社会保険料75,125円・所得税43,380円・手取り381,495円です。</p>
+    <p class="note" style="margin-top:8px">計算方法：社会保険料＝賞与額×社会保険料率、所得税＝（賞与額−社会保険料）×所得税率、手取り＝賞与額−社会保険料−所得税。社会保険料率は、健康保険料率（都道府県別・本人負担は半分）＋介護保険料率1.62％の半分（40〜64歳のみ）＋厚生年金保険料率18.3％の半分＋雇用保険料率0.6％（本人負担分）です。実際の賞与計算では標準賞与額（1,000円未満切り捨て）や料率の端数処理などが行われるため、実際の支給額とは数円〜数百円程度異なる場合があります。あくまで目安としてご利用ください。</p>
+    <p class="note" style="margin-top:8px">令和8年4月分（5月納付分）から、全国一律0.23％の子ども・子育て支援金が別途かかります。この計算には含めていません。</p>
+  </div>
+
+  <div class="card">
+    <h2>協会けんぽ 健康保険料率（令和8年度・都道府県別）</h2>
+    <table class="rate">
+      <tr><th>都道府県</th><th class="v">健康保険料率</th><th class="v">本人負担分（半分）</th></tr>
+    </table>
+    <p class="note" style="margin-top:10px">出典：全国健康保険協会（協会けんぽ）「令和8年度都道府県単位保険料率（令和8年3月分（4月納付分））」<br>
+    <a href="https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/rate_prefectures/r08/" target="_blank" rel="noopener">https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/rate_prefectures/r08/</a><br>
+    介護保険料率1.62％（全国一律・40〜64歳）も同ページで確認しています。料率の確認日：2026年11月11日。全47都道府県の料率を確認済みです。使われるのは住んでいる都道府県ではなく、勤め先の事業所がある都道府県の料率です。健康保険組合に加入している方は、この表ではなく組合の料率が使われます。</p>
+  </div>
+
+  <footer>入力内容はブラウザ内でのみ処理され、送信されません。</footer>
+</div>
+
+<script>
+// 協会けんぽ 令和8年度 都道府県単位保険料率（労使合計・％）
+// 出典：https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/rate_prefectures/r08/ （2026-11-11確認）
+const RATES = [
+  ["北海道",10.28],["青森県",9.85],["岩手県",9.51],["宮城県",10.10],["秋田県",10.01],
+  ["山形県",9.75],["福島県",9.50],["茨城県",9.52],["栃木県",9.82],["群馬県",9.68],
+  ["埼玉県",9.67],["千葉県",9.73],["東京都",9.85],["神奈川県",9.92],["新潟県",9.21],
+  ["富山県",9.59],["石川県",9.70],["福井県",9.71],["山梨県",9.55],["長野県",9.63],
+  ["岐阜県",9.80],["静岡県",9.61],["愛知県",9.93],["三重県",9.77],["滋賀県",9.88],
+  ["京都府",9.89],["大阪府",10.13],["兵庫県",10.12],["奈良県",9.91],["和歌山県",10.06],
+  ["鳥取県",9.86],["島根県",9.94],["岡山県",10.05],["広島県",9.78],["山口県",10.15],
+  ["徳島県",10.24],["香川県",10.02],["愛媛県",9.98],["高知県",10.05],["福岡県",10.11],
+  ["佐賀県",10.55],["長崎県",10.06],["熊本県",10.08],["大分県",10.08],["宮崎県",9.77],
+  ["鹿児島県",10.13],["沖縄県",9.44]
+];
+const CAREGIVER_RATE = 1.62, PENSION_RATE = 18.3, EMPLOY_RATE = 0.6;
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const yen = n => Math.round(n).toLocaleString("ja-JP") + " 円";
+
+const prefEl = document.getElementById("pref");
+RATES.forEach(([name, rate]) => {
+  const o = document.createElement("option");
+  o.value = rate; o.textContent = name + "（" + rate.toFixed(2) + "％）";
+  if(name === "東京都") o.selected = true;
+  prefEl.appendChild(o);
+});
+const rateTable = document.querySelector("table.rate");
+RATES.forEach(([name, rate]) => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = "<td>" + name + "</td><td class=\"v\">" + rate.toFixed(2) + "％</td><td class=\"v\">" + (rate / 2).toFixed(2) + "％</td>";
+  rateTable.appendChild(tr);
+});
+
+function calc(){
+  const bonus = num(bonusEl.value);
+  const healthRate = num(prefEl.value);
+  const care = ageEl.value === "care";
+  const taxRate = num(taxRateEl.value) / 100;
+  const kenpo = Math.round(bonus * healthRate / 2 / 100);
+  const kaigo = care ? Math.round(bonus * CAREGIVER_RATE / 2 / 100) : 0;
+  const nenkin = Math.round(bonus * PENSION_RATE / 2 / 100);
+  const koyo = Math.round(bonus * EMPLOY_RATE / 100);
+  const shaho = kenpo + kaigo + nenkin + koyo;
+  const tax = Math.round((bonus - shaho) * taxRate);
+  const net = bonus - shaho - tax;
+  kenpoRateEl.textContent = healthRate.toFixed(2);
+  kenpoEl.textContent = yen(kenpo);
+  kaigoEl.textContent = care ? yen(kaigo) : "対象外";
+  nenkinEl.textContent = yen(nenkin);
+  koyoEl.textContent = yen(koyo);
+  shahoEl.textContent = yen(shaho);
+  taxEl.textContent = yen(tax);
+  netEl.textContent = yen(net);
+}
+const bonusEl = document.getElementById("bonus"), ageEl = document.getElementById("age"),
+      taxRateEl = document.getElementById("taxRate");
+const kenpoRateEl = document.getElementById("kenpoRate"), kenpoEl = document.getElementById("kenpo"),
+      kaigoEl = document.getElementById("kaigo"), nenkinEl = document.getElementById("nenkin"),
+      koyoEl = document.getElementById("koyo"), shahoEl = document.getElementById("shaho"),
+      taxEl = document.getElementById("tax"), netEl = document.getElementById("net");
+[bonusEl, prefEl, ageEl, taxRateEl].forEach(e => e.addEventListener("input", calc));
+calc();
+</script>
+</body>
+</html>
