@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ふるさと納税 控除上限額 早見表｜年収×家族構成マトリクス</title>
+<meta name="description" content="ふるさと納税で実質負担2,000円に収まる寄付上限額の目安を、年収（300万〜1,000万円）×家族構成（独身／配偶者のみ／配偶者＋子1人／配偶者＋子2人）の早見表で一覧できます。各セルから内訳ページへ移動できます。">
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1c2333; --sub:#5b6478; --line:#dde1ea; --acc:#059669; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+  header h1{font-size:25px;margin:8px 0 4px}
+  header p{color:var(--sub);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+  .card h2{font-size:17px;margin:0 0 12px}
+  .big{font-size:32px;font-weight:900;text-align:center;margin:8px 0 2px}
+  .sub2{text-align:center;color:var(--sub);font-size:14px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td,th{padding:6px 0;color:var(--sub);text-align:left}
+  td.v,th.v{text-align:right;color:var(--ink);font-weight:800}
+  tr.total td{border-top:2px solid var(--line);font-size:17px;color:var(--ink);font-weight:800}
+  tr.total td.v{font-size:19px}
+  .note{font-size:13px;color:var(--sub)}
+  .qa p{margin:0 0 10px}
+  .qa p:last-child{margin-bottom:0}
+  .links a{color:var(--acc);font-weight:700}
+  .ad{border:1px dashed var(--acc);border-radius:12px;padding:14px;margin-top:12px;background:#f0f7fc} .ad .pr{font-size:11px;color:var(--sub);letter-spacing:.08em} .ad a{font-weight:800}
+  footer{color:var(--sub);font-size:12.5px;margin-top:22px}
+  table.mx td,table.mx th{padding:8px 6px;border-bottom:1px solid #eef0f4}
+  table.mx a{color:var(--acc);text-decoration:none;font-weight:800}
+  table.mx a:hover{text-decoration:underline}
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "ふるさと納税 控除上限額 早見表（年収×家族構成）",
+  "url": "https://ikesita.github.io/money-tools/furusato-matrix.html",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any",
+  "inLanguage": "ja",
+  "description": "ふるさと納税で実質負担2,000円に収まる寄付上限額の目安を、年収（300万〜1,000万円）×家族構成（独身／配偶者のみ／配偶者＋子1人／配偶者＋子2人）の早見表で一覧できます。各セルから内訳ページへ移動できます。",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "JPY"
+  },
+  "isAccessibleForFree": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "ふるさと納税の上限額はなぜ家族構成で変わるのですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "配偶者控除や扶養控除によって課税所得が下がり、住民税所得割が減るためです。ふるさと納税の住民税特例控除には住民税所得割の2割という上限があるため、所得割が下がると寄付の上限額も下がります。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "この早見表の金額はどうやって計算していますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "当サイトのふるさと納税計算機と同じ目安表（年収と上限額の対応表）を使い、配偶者＋高校生の子がいる場合は計算機と同じ補正（子1人：×0.87、子2人：×0.87×0.87）を適用して千円単位に四捨五入しています。すべて目安です。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "iDeCoや住宅ローン控除がある場合もこの表の金額で大丈夫ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "いいえ。iDeCoの掛金は全額所得控除、住宅ローン控除は住民税とも競合するため、どちらも上限額を下げます。各内訳ページに変化の目安を記載していますが、正確な額は公式シミュレーターで確認してください。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>ふるさと納税 控除上限額 早見表（年収×家族構成）</h1>
+    <p>給与収入のみの会社員で、ふるさと納税以外の控除がない場合の目安です。金額はすべて目安で、子は高校生（16〜18歳の扶養親族）を想定しています。各金額をクリックすると、その組み合わせの内訳ページが開きます。</p>
+  </header>
+
+  <div class="card">
+    <h2>控除上限額の目安 一覧</h2>
+    <table class="mx">
+      <tr><th>年収＼家族構成</th><th class="v">独身</th><th class="v">配偶者のみ</th><th class="v">配偶者＋子1人</th><th class="v">配偶者＋子2人</th></tr>
+      <tr><th>年収300万円</th><td class="v"><a href="furusato-m-300-single.html">約28,000円</a></td><td class="v"><a href="furusato-m-300-spouse.html">約33,000円</a></td><td class="v"><a href="furusato-m-300-child1.html">約29,000円</a></td><td class="v"><a href="furusato-m-300-child2.html">約25,000円</a></td></tr>
+      <tr><th>年収400万円</th><td class="v"><a href="furusato-m-400-single.html">約42,000円</a></td><td class="v"><a href="furusato-m-400-spouse.html">約33,000円</a></td><td class="v"><a href="furusato-m-400-child1.html">約29,000円</a></td><td class="v"><a href="furusato-m-400-child2.html">約25,000円</a></td></tr>
+      <tr><th>年収500万円</th><td class="v"><a href="furusato-m-500-single.html">約61,000円</a></td><td class="v"><a href="furusato-m-500-spouse.html">約49,000円</a></td><td class="v"><a href="furusato-m-500-child1.html">約43,000円</a></td><td class="v"><a href="furusato-m-500-child2.html">約37,000円</a></td></tr>
+      <tr><th>年収600万円</th><td class="v"><a href="furusato-m-600-single.html">約77,000円</a></td><td class="v"><a href="furusato-m-600-spouse.html">約69,000円</a></td><td class="v"><a href="furusato-m-600-child1.html">約60,000円</a></td><td class="v"><a href="furusato-m-600-child2.html">約52,000円</a></td></tr>
+      <tr><th>年収700万円</th><td class="v"><a href="furusato-m-700-single.html">約108,000円</a></td><td class="v"><a href="furusato-m-700-spouse.html">約89,000円</a></td><td class="v"><a href="furusato-m-700-child1.html">約77,000円</a></td><td class="v"><a href="furusato-m-700-child2.html">約67,000円</a></td></tr>
+      <tr><th>年収800万円</th><td class="v"><a href="furusato-m-800-single.html">約129,000円</a></td><td class="v"><a href="furusato-m-800-spouse.html">約124,000円</a></td><td class="v"><a href="furusato-m-800-child1.html">約108,000円</a></td><td class="v"><a href="furusato-m-800-child2.html">約94,000円</a></td></tr>
+      <tr><th>年収900万円</th><td class="v"><a href="furusato-m-900-single.html">約151,000円</a></td><td class="v"><a href="furusato-m-900-spouse.html">約145,000円</a></td><td class="v"><a href="furusato-m-900-child1.html">約126,000円</a></td><td class="v"><a href="furusato-m-900-child2.html">約110,000円</a></td></tr>
+      <tr><th>年収1000万円</th><td class="v"><a href="furusato-m-1000-single.html">約176,000円</a></td><td class="v"><a href="furusato-m-1000-spouse.html">約166,000円</a></td><td class="v"><a href="furusato-m-1000-child1.html">約144,000円</a></td><td class="v"><a href="furusato-m-1000-child2.html">約126,000円</a></td></tr>
+    </table>
+    <p class="note" style="margin-top:10px">なお、当サイトの目安表では「配偶者あり」の区分が年収400万円から始まるため、年収300万円の場合は400万円の値（33,000円）を流用して表示しています。実際の上限額はこれより低くなる可能性がありますので、寄付額は控えめに見積もるのが安全です。</p>
+  </div>
+
+  <div class="card">
+    <h2>計算方法と前提</h2>
+    <p style="margin:0 0 10px">この早見表は、当サイトの<a href="furusato.html">ふるさと納税 控除上限額の計算機</a>と同じ目安表と計算方法で作成しています。</p>
+    <table>
+      <tr><td>独身の目安表</td><td class="v">年収300万円：28,000円 〜 1,000万円：176,000円</td></tr>
+      <tr><td>配偶者のみの目安表</td><td class="v">年収400万円：33,000円 〜 1,000万円：166,000円</td></tr>
+      <tr><td>配偶者＋高校生の子1人</td><td class="v">配偶者のみの目安額 × 0.87（千円単位に四捨五入）</td></tr>
+      <tr><td>配偶者＋高校生の子2人</td><td class="v">配偶者のみの目安額 × 0.87 × 0.87（千円単位に四捨五入）</td></tr>
+    </table>
+    <p class="note" style="margin-top:10px">目安表の区切り（100万円刻み）の間の年収では、計算機が前後の値を線形補間します。子どもの補正係数0.87は、計算機の「配偶者＋高校生1人」で使われているものと同じで、子2人の場合はこの補正を2回適用しています。子どもが大学生（19〜22歳）の場合は扶養控除が大きくなるため、計算機の「配偶者＋大学生1人」（×0.75）もあわせてご確認ください。</p>
+  </div>
+
+  <div class="card">
+    <h2>読み方のポイント</h2>
+    <p style="margin:0 0 10px">ふるさと納税の控除上限は、主に住民税所得割の2割（住民税特例控除の上限）を目安に決まります。配偶者控除（所得税38万円・住民税33万円）や扶養控除（高校生1人あたり所得税38万円・住民税33万円）で課税所得が下がると住民税所得割が減り、上限額も下がります。そのため同じ年収でも、独身→配偶者のみ→子1人→子2人の順に上限額は下がっていきます。</p>
+    <p class="note" style="margin:0">iDeCoの掛金（全額所得控除）や住宅ローン控除がある場合は、上限額はこの表よりさらに下がります。各内訳ページに変化の目安を記載しています。共働き世帯・自営業・年金収入がある場合も結果が変わります。正確な額は、お住まいの自治体や公式のシミュレーターでご確認ください。</p>
+  </div>
+
+  <div class="card qa">
+    <h2>よくある質問</h2>
+    <p><b>Q. ふるさと納税の上限額はなぜ家族構成で変わるのですか？</b><br>A. 配偶者控除や扶養控除によって課税所得が下がり、住民税所得割が減るためです。ふるさと納税の住民税特例控除には住民税所得割の2割という上限があるため、所得割が下がると寄付の上限額も下がります。</p>
+    <p><b>Q. この早見表の金額はどうやって計算していますか？</b><br>A. 当サイトのふるさと納税計算機と同じ目安表（年収と上限額の対応表）を使い、配偶者＋高校生の子がいる場合は計算機と同じ補正（子1人：×0.87、子2人：×0.87×0.87）を適用して千円単位に四捨五入しています。すべて目安です。</p>
+    <p><b>Q. iDeCoや住宅ローン控除がある場合もこの表の金額で大丈夫ですか？</b><br>A. いいえ。iDeCoの掛金は全額所得控除、住宅ローン控除は住民税とも競合するため、どちらも上限額を下げます。各内訳ページに変化の目安を記載していますが、正確な額は公式シミュレーターで確認してください。</p>
+  </div>
+
+  <div class="card links">
+    <h2>計算機で詳しく計算する</h2>
+    <p style="margin:0">早見表にない年収や、大学生の子がいる場合は、<a href="furusato.html">ふるさと納税 控除上限額の計算機</a>で年収と家族構成を入力して計算できます。</p>
+  </div>
+
+  <div class="ad"><div class="pr">PR（アフィリエイト広告）</div><p>ふるさと納税の寄附を受け付けているポータルサイトの例です。取り扱い自治体・返礼品・決済手段は公式サイトでご確認ください。</p><ul><li><a href="https://px.a8.net/svt/ejp?a8mat=4BGHVP+8C2HO2+5IMU+5YRHE" rel="nofollow">ふるさと本舗</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4BGHVP+8C2HO2+5IMU+5YRHE" alt=""></li><li><a href="https://px.a8.net/svt/ejp?a8mat=4BGHVP+8CNX9U+54OC+5YJRM" rel="nofollow">au PAY ふるさと納税</a><img border="0" width="1" height="1" src="https://www13.a8.net/0.gif?a8mat=4BGHVP+8CNX9U+54OC+5YJRM" alt=""></li></ul></div>
+  <footer>本ページの金額はすべて目安です。税制は年度により改正されますので、正式な金額は公式情報でご確認ください。</footer>
+</div>
+</body>
+</html>
